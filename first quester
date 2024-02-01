@@ -1,0 +1,49 @@
+BANETO_DefineProfileName('Gnome Lock_1')
+BANETO_DefineProfileType('Questing')
+BANETO_DefineQuestPickupNPC(-6214.853515625, 328.18121337891, 383.48599243164, 658)
+BANETO_DefineQuestTargetId(99999)
+BANETO_DefineQuestStepType([[KillAndLoot]])
+BANETO_DefineQuestId(179)
+BANETO_SetNextLocalQuestProfile([[Gnome Lock_2]])
+BANETO_DefineBlacklist(-6398.0356445312, 278.91757202148, 393.65472412109, 20)
+
+function _G.BANETO_ExecuteCustomQuestPulse()
+    local questID = 179
+    local targetCoordinates = {x = -6214.8920898438, y = 328.1852722168, z = 383.48016357422}
+    local proximityThreshold = 5
+
+    local _, _, _, mobTalk = GetQuestObjectiveInfo(questID, 1, false)
+    local _, _, _, mobSlain = GetQuestObjectiveInfo(questID, 2, false)
+
+    if mobTalk then
+        print("Speak to Sten Stoutarm.")
+    end
+
+    if mobSlain == 0 then
+        print("Defeat the Ragged Young Wolf.")
+        local mobWeKill = GetObjectWithIdIncludingBlacklistCheck(705)
+
+        if mobWeKill then
+            if UnitIsDeadOrGhost("target") then
+                BANETO_AddMobToGuidBlacklist(BANETO_Object("target"))
+                BANETO_ClearTarget()
+            else
+                UnlockedTargetUnit(mobWeKill)
+                local mobX, mobY, mobZ = BANETO_ObjectPosition(mobWeKill)
+
+                if not BANETO_PlayerPosition(mobX, mobY, mobZ, 5) then
+                    BANETO_MeshTo(mobX, mobY, mobZ)
+                elseif IsMounted() then
+                    BANETO_Dismount()
+                end
+            end
+        end
+    elseif not BANETO_PlayerPosition(-6299.22265625, 342.89080810547, 376.54516601562, 15) then
+        BANETO_MeshTo(-6299.22265625, 342.89080810547, 376.54516601562)
+    end
+
+    BANETO_ExecuteCustomQuestPulse_SkipNormalBehavior = nil
+    _G.BANETO_ExecuteCustomQuestPulse_Questmaster = nil
+    BANETO_DefineCenter(-6214.853515625, 328.18121337891, 383.48599243164, 10)
+    BANETO_DefineQuestTurninNPC(-6214.853515625, 328.18121337891, 383.48599243164, 658)
+end
